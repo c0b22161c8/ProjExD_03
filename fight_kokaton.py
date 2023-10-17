@@ -148,6 +148,9 @@ class Beam:
 
 
 class Explosion:
+    """
+    爆発に関するクラス
+    """
     def __init__(self, bomb):
         exp = pg.transform.rotozoom(pg.image.load(f"ex03/fig/explosion.gif"), 0, 1.0)
         self.exps = [exp, pg.transform.flip(exp, True, True)]
@@ -163,6 +166,9 @@ class Explosion:
 
 
 class Score:
+    """
+    スコアに関するクラス
+    """
     def __init__(self):
         self.font = pg.font.SysFont(None, 80)
         self.score = 0
@@ -204,6 +210,8 @@ def main():
                 time.sleep(1)
                 return
             if i!=None and beam!=None and beam.rct.colliderect(i.rct):
+                #爆弾とビームが当たったら、爆発クラスのインスタンスを生成し、爆弾とビームを消す
+                #スコアを増やしこうかとんの画像を変更する
                 exp.append(Explosion(i.rct))
                 bombs[n]=beam=None
                 txt.score += 1
