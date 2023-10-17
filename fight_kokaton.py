@@ -144,6 +144,21 @@ class Beam:
         screen.blit(self.img, self.rct)
 
 
+class Explosion:
+    def __init__(self, bomb):
+        exp = pg.transform.rotozoom(pg.image.load(f"ex03/fig/explosion.gif"), 0, 1.0)
+        self.exps = [exp, pg.transform.flip(exp, True, True)]
+        self.exp = self.exps[0]
+        self.rct = self.exp.get_rect()
+        self.rct.center = bomb.center
+        self.life = 10
+
+    def update(self, screen: pg.Surface):
+        self.life -=1
+        self.exp=self.exps[self.life%2]
+        screen.blit(self.exp, self.rct)
+
+
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -151,6 +166,7 @@ def main():
     bird = Bird(3, (900, 400))
     bombs = [Bomb() for i in range(5)]
     beam = None
+    exp = []
 
     clock = pg.time.Clock()
     tmr = 0
@@ -163,7 +179,7 @@ def main():
 
         screen.blit(bg_img, [0, 0])
 
-        for i in bombs:
+        for n,i in enumerate(bombs):
             if i!=None and i.rct.colliderect(bird.rct):
                 # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
                 bird.change_img(8, screen)
@@ -171,12 +187,17 @@ def main():
                 time.sleep(1)
                 return
             if i!=None and beam!=None and beam.rct.colliderect(i.rct):
-                i=beam=None
+                exp.append(Explosion(i.rct))
+                bombs[n]=beam=None
                 bird.change_img(6, screen)
                 pg.display.update()
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
+        if exp:
+            for i in exp:
+                if i.life==0: i = None
+                if i!=None: i.update(screen)
         for i in bombs:
             if i!=None: i.update(screen)
         if beam!=None: beam.update(screen)
